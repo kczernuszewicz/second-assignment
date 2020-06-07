@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from sklearn import linear_model
+from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import LabelEncoder
 
 df_results = pd.read_csv('survey_results_public.csv',
@@ -34,7 +36,7 @@ var_y = df_results[['YearsCode']]
 var_x1 = df_results[['YearsCodePro']]
 var_x2 = df_results[['Age1stCode']]
 
-df_adj = df_results[['YearsCode', 'YearsCodePro', 'Age1stCode']]
+df_adj = df_results[['YearsCode', 'YearsCodePro', 'Age1stCode', 'Hobbyist', 'MgrIdiot']]
 
 Q1 = df_adj.quantile(0.25)
 Q3 = df_adj.quantile(0.75)
@@ -64,3 +66,21 @@ plt.show()
 
 print(df_adj_sd.corr())
 print(df_adj_q.corr())
+
+
+reg = linear_model.LinearRegression()
+
+#reg.fit(df_adj_q[['YearsCodePro']], df_adj_q['YearsCode'])
+#reg.fit(df_adj_q[['YearsCodePro', 'Age1stCode']], df_adj_q['YearsCode'])
+reg.fit(df_adj_q[['YearsCodePro', 'Age1stCode', 'Hobbyist', 'MgrIdiot']], df_adj_q['YearsCode'])
+
+#print(mean_squared_error(df_adj_q[['YearsCodePro']], df_adj_q['YearsCode']))
+#print(mean_squared_error(df_adj_q[['YearsCodePro', 'Age1stCode']], df_adj_q['YearsCode']))
+#print(mean_squared_error(df_adj_q[['YearsCodePro', 'Age1stCode', 'Hobbyist', 'MgrIdiot']], df_adj_q['YearsCode']))
+
+y_true = df_adj_q['YearsCode']
+y_pred = reg.predict(df_adj_q[['YearsCodePro', 'Age1stCode', 'Hobbyist', 'MgrIdiot']])
+print(mean_squared_error(y_true, y_pred))
+
+
+
