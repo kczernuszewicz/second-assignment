@@ -1,8 +1,10 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
 
 df_results = pd.read_csv('survey_results_public.csv',
                          usecols=['Respondent', 'Age1stCode', 'YearsCode', 'YearsCodePro'],
@@ -18,6 +20,7 @@ df_results.replace(to_replace={'Less than 1 year': '0',
 
 df_results[['Age1stCode', 'YearsCode', 'YearsCodePro']] = df_results[
     ['Age1stCode', 'YearsCode', 'YearsCodePro']].astype(float)
+
 
 print(df_results.corr())
 
@@ -38,10 +41,12 @@ plt.show()
 sns.boxplot(y='YearsCodePro', data=df_results)
 plt.show()
 
+X_train, X_test, y_train, y_test = train_test_split(
+    df_results[['YearsCodePro', 'Age1stCode']], df_results.YearsCode, test_size=0.2, random_state=777)
+
 reg = linear_model.LinearRegression()
-reg.fit(df_results[['YearsCodePro', 'Age1stCode']], df_results['YearsCode'])
+reg.fit(X_train, y_train)
 
-reg_true = df_results['YearsCode']
-reg_pred = reg.predict(df_results[['YearsCodePro', 'Age1stCode']])
+reg_pred = reg.predict(X_test)
 
-print(mean_squared_error(reg_true, reg_pred))
+print(mean_squared_error(y_test, reg_pred))
